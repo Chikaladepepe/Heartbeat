@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heartbeat</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        body { background: #fff5f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: 'Georgia', serif; overflow: hidden; }
+        
+        /* The Heart Button */
+        #heart-btn { width: 150px; cursor: pointer; transition: transform 0.3s; animation: beat 1.5s infinite; z-index: 10; }
+        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        /* The Paper Scroll */
+        #letter-container { 
+            display: none; position: fixed; width: 85%; max-width: 400px; background: #fdfbf7; 
+            padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 5px;
+            transform: scaleY(0); transform-origin: top; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20; text-align: center; color: #444; border: 1px solid #eee;
+        }
+        #letter-container.open { display: block; transform: scaleY(1); }
+        
+        .paper-texture { font-size: 20px; line-height: 1.6; font-style: italic; white-space: pre-wrap; }
+        .close-btn { margin-top: 20px; font-size: 14px; color: #999; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+    <img src="icon.png" id="heart-btn" alt="Heart">
+
+    <div id="letter-container">
+        <div class="paper-texture" id="letter-text">Loading my heart...</div>
+        <div class="close-btn" onclick="closeLetter()">Close Letter</div>
+    </div>
+
+    <script>
+        const btn = document.getElementById('heart-btn');
+        const container = document.getElementById('letter-container');
+        const text = document.getElementById('letter-text');
+
+        btn.onclick = async () => {
+            btn.style.display = 'none'; // Heart disappears
+            container.style.display = 'block';
+            setTimeout(() => container.classList.add('open'), 10); // Animation trigger
+
+            try {
+                const res = await fetch('/api/get-letter');
+                const data = await res.json();
+                text.innerText = data.letter;
+            } catch (err) {
+                text.innerText = "The connection flickered... but my feelings didn't. Try again?";
+            }
+        };
+
+        function closeLetter() {
+            container.classList.remove('open');
+            setTimeout(() => {
+                container.style.display = 'none';
+                btn.style.display = 'block';
+            }, 500);
+        }
+    </script>
+</body>
+</html>
