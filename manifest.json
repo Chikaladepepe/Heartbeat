@@ -1,0 +1,16 @@
+{
+  "name": "Heartbeat",
+  "short_name": "Heartbeat",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff5f5",
+  "theme_color": "#ff4d4d",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
