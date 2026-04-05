@@ -6,30 +6,22 @@
     <title>Heartbeat</title>
     <link rel="manifest" href="/manifest.json">
     <style>
-        body { 
-            background: linear-gradient(180deg, #2d1b4e 0%, #7a4d7b 50%, #d63384 100%); 
-            display: flex; justify-content: center; align-items: center; 
-            height: 100vh; margin: 0; font-family: 'Georgia', serif; overflow: hidden; 
-        }
-
-        /* Stars Background */
+        body { background: linear-gradient(180deg, #2d1b4e 0%, #7a4d7b 50%, #d63384 100%); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: 'Georgia', serif; overflow: hidden; }
         .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: twinkle var(--duration) infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
 
         /* Loading Screen */
-        #loader { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            z-index: 100; transition: opacity 1s ease; 
-        }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; transition: opacity 1s ease; }
         .loader-text { color: white; font-size: 16px; letter-spacing: 3px; font-style: italic; margin-bottom: 20px; }
-        
-        /* Progress Bar */
         #progress-container { width: 200px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; }
         #progress-bar { width: 0%; height: 100%; background: white; transition: width 8s linear; }
 
         /* Main UI */
-        #heart-btn { width: 160px; cursor: pointer; transition: transform 0.3s, opacity 0.5s; animation: beat 1.5s infinite; z-index: 10; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3)); display: none; opacity: 0; }
+        #ui-wrapper { display: flex; flex-direction: column; align-items: center; z-index: 10; display: none; opacity: 0; transition: opacity 1s; }
+        #click-me { color: white; font-size: 14px; letter-spacing: 2px; margin-bottom: 20px; font-style: italic; opacity: 0.8; animation: pulse 2s infinite; }
+        #heart-btn { width: 160px; cursor: pointer; transition: transform 0.3s; animation: beat 1.5s infinite; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3)); }
+        
+        @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
         @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
         /* The Paper Scroll */
@@ -46,18 +38,18 @@
 </head>
 <body>
 
-    <!-- Stars Generator Container -->
     <div id="stars"></div>
 
-    <!-- Loading Screen -->
     <div id="loader">
         <div class="loader-text">SYNCHRONIZING...</div>
-        <div id="progress-container">
-            <div id="progress-bar"></div>
-        </div>
+        <div id="progress-container"><div id="progress-bar"></div></div>
     </div>
 
-    <img src="icon.png" id="heart-btn" alt="Heart">
+    <!-- Grouped Heart and Text -->
+    <div id="ui-wrapper">
+        <div id="click-me">Click me for today's message!</div>
+        <img src="icon.png" id="heart-btn" alt="Heart">
+    </div>
 
     <div id="letter-container">
         <div class="paper-texture" id="letter-text">Reading my heart...</div>
@@ -65,7 +57,7 @@
     </div>
 
     <script>
-        // Generate Stars
+        // Stars Logic
         const starsContainer = document.getElementById('stars');
         for (let i = 0; i < 50; i++) {
             const star = document.createElement('div');
@@ -79,28 +71,26 @@
 
         const loader = document.getElementById('loader');
         const bar = document.getElementById('progress-bar');
+        const ui = document.getElementById('ui-wrapper');
         const btn = document.getElementById('heart-btn');
         const container = document.getElementById('letter-container');
         const text = document.getElementById('letter-text');
 
         window.onload = () => {
-            // Start progress bar
             setTimeout(() => { bar.style.width = '100%'; }, 100);
-
-            // Hide loader after 8s
             setTimeout(() => {
                 loader.style.opacity = '0';
                 setTimeout(() => {
                     loader.style.display = 'none';
-                    btn.style.display = 'block';
-                    setTimeout(() => btn.style.opacity = '1', 50);
+                    ui.style.display = 'flex';
+                    setTimeout(() => ui.style.opacity = '1', 50);
                 }, 1000);
             }, 8000); 
         };
 
         btn.onclick = async () => {
-            btn.style.opacity = '0';
-            setTimeout(() => btn.style.display = 'none', 300);
+            ui.style.opacity = '0';
+            setTimeout(() => ui.style.display = 'none', 300);
             container.style.display = 'block';
             setTimeout(() => container.classList.add('open'), 50);
 
@@ -109,7 +99,7 @@
                 const data = await res.json();
                 text.innerText = data.letter;
             } catch (err) {
-                text.innerText = "I lost my words... try tapping again?";
+                text.innerText = "Connection lost... but my feelings didn't. Try again?";
             }
         };
 
@@ -117,8 +107,8 @@
             container.classList.remove('open');
             setTimeout(() => {
                 container.style.display = 'none';
-                btn.style.display = 'block';
-                setTimeout(() => btn.style.opacity = '1', 50);
+                ui.style.display = 'flex';
+                setTimeout(() => ui.style.opacity = '1', 50);
             }, 600);
         }
     </script>
